@@ -6,10 +6,11 @@ import "github.com/google/uuid"
 type Role struct {
 	ID           uuid.UUID
 	Name         string
-	PermissionID []int
+	PermissionID []uuid.UUID
 }
 
 // SetPermission sets single or multiple permission IDs to Role
 func (r *Role) SetPermission(p *Permission) (*Role, error) {
+	r.PermissionID = append(r.PermissionID, p.ID)
 	return r, nil
 }

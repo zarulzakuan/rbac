@@ -6,10 +6,11 @@ import "github.com/google/uuid"
 type User struct {
 	ID     uuid.UUID
 	Name   string
-	RoleID int
+	RoleID uuid.UUID
 }
 
 // SetRole sets role id to user
 func (u *User) SetRole(r *Role) (*User, error) {
+	u.RoleID = r.ID
 	return u, nil
 }
