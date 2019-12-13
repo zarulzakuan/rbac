@@ -1,16 +1,26 @@
 package components
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 // User is well, user. 1 user can only have one role
 type User struct {
-	ID     uuid.UUID
-	Name   string
-	RoleID uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
+	ID        uuid.UUID `gorm:"primary_key"`
+	Name      string    `gorm:"unique;not null"`
+	RoleID    uuid.UUID
 }
 
 // SetRole sets role id to user
-func (u *User) SetRole(r *Role) (*User, error) {
+func (dbenv *DBEnv) SetRole(r *Role, u *User) (*User, error) {
 	u.RoleID = r.ID
+	if dbObj := dbenv.Save(u); dbObj.Error != nil {
+		return nil, dbObj.Error
+	}
 	return u, nil
 }

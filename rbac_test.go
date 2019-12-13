@@ -6,62 +6,81 @@ import (
 
 )
 
+func TestInitDB(t *testing.T) {
+	InitDB()
+
+}
+
 func TestCreatePermission(t *testing.T) {
-	p, err := NewPermission("RO")
+	db := InitDB()
+	p, err := db.NewPermission("RO")
 	if err != nil {
 		t.Error()
 	}
+	defer db.CloseDB();
 	log.Println(p)
 }
 
 func TestCreateRole(t *testing.T) {
-	r, err := NewRole("Admin")
+	db := InitDB()
+	r, err := db.NewRole("Admin")
 	if err != nil {
 		t.Error()
 	}
+	defer db.CloseDB();
+
 	log.Println(r)
 }
 
 func TestCreateUser(t *testing.T) {
-	u, err := NewUser("Zarul")
+
+	db := InitDB()
+	
+	u, err := db.NewUser("testuser")
+
 	if err != nil {
 		t.Error()
 	}
+	defer db.CloseDB();
 	log.Println(u)
 }
 
 func TestUserWithRoleWithPermission(t *testing.T) {
-	pro, err := NewPermission("RO")
+	db := InitDB()
+	
+	pro, err := db.NewPermission("RO")
 	if err != nil {
 		t.Error()
 	}
 
-	prw, err := NewPermission("RW")
+	prw, err := db.NewPermission("RW")
 	if err != nil {
 		t.Error()
 	}
 
-	r, err := NewRole("Admin")
+	r, err := db.NewRole("Admin")
 	if err != nil {
 		t.Error()
 	}
-	u, err := NewUser("Zarul")
-	if err != nil {
-		t.Error()
-	}
-
-	r, err = r.SetPermission(pro)
-	if err != nil {
-		t.Error()
-	}
-	r, err = r.SetPermission(prw)
-	if err != nil {
-		t.Error()
-	}
-	u, err = u.SetRole(r)
+	
+	
+	u, err := db.NewUser("Zarul")
 	if err != nil {
 		t.Error()
 	}
 
+	r, err = db.SetPermission(pro, r)
+	if err != nil {
+		t.Error()
+	}
+	r, err = db.SetPermission(prw,r)
+	if err != nil {
+		t.Error()
+	}
+	u, err = db.SetRole(r,u)
+	if err != nil {
+		t.Error()
+	}
+	defer db.CloseDB();
 	log.Println(r)
 }

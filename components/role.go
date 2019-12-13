@@ -1,16 +1,31 @@
 package components
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/jinzhu/gorm"
+)
+
+type DBEnv struct {
+	*gorm.DB
+}
 
 // Role is given to a single user, but can have multiple permissions
 type Role struct {
-	ID           uuid.UUID
-	Name         string
-	PermissionID []uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   *time.Time
+	ID          uuid.UUID     `gorm:"primary_key"`
+	Name        string        `gorm:"unique;not null"`
+	Permissions []*Permission `gorm:"many2many:role_permission;"`
 }
 
 // SetPermission sets single or multiple permission IDs to Role
-func (r *Role) SetPermission(p *Permission) (*Role, error) {
-	r.PermissionID = append(r.PermissionID, p.ID)
+func (dbenv *DBEnv) SetPermission(p *Permission, r *Role) (*Role, error) {
+	r.Permissions = append(r.Permissions, p)
+	if dbObj := dbenv.Save(r); dbObj.Error != nil {
+		return nil, dbObj.Error
+	}
 	return r, nil
 }
